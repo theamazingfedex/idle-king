@@ -1,0 +1,36 @@
+.Mining-explorer-container {
+  background-color: #594979;
+  padding: 1em;
+}
+.Mining-explorer-header {
+  background-color: #244727;
+  padding: 1em;
+}
+.Mining-explorer-grid {
+  background-color: #444777;
+  padding: 1em;
+}
+.Mining-explorer-cell {
+  /* width: 10em; */
+  height: 10em !important;
+  vertical-align: middle;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #444222;
+
+  border-radius: 0.5em;
+  /* margin: 0 auto; */
+
+  text-align: center;
+  font-size: calc(0.3em + 0.5vmin);
+}
+.Mining-explorer-cell > img {
+  padding: 20px;
+  width: 40px;
+}
+
+.ProgressBar-container {
+  width: 6em;
+}

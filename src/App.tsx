@@ -1,26 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useMemo, useState } from 'react';
 import './App.css';
+import Header from './components/Header';
+import MainPage from './components/MainPage';
+import Sidebar from './components/Sidebar';
+import MiningSkill from './components/skills/mining';
+import BankingSkill from './components/skills/banking';
+import { Grid, Cell } from 'styled-css-grid';
+import { AllSkills } from './utils';
+import MarketingHome from './components/skills/marketing';
+
+const getChosenViewTarget = (chosenTarget: AllSkills) => {
+  switch (chosenTarget) {
+    case AllSkills.BANKING:
+      return <BankingSkill/>;
+    case AllSkills.MINING:
+      return <MiningSkill/>;
+    case AllSkills.MARKETING:
+      return <MarketingHome/>;
+    default:
+      return <BankingSkill/>;
+  }
+}
 
 function App() {
+  const [chosenViewTarget, setChosenViewTarget] = useState(AllSkills.BANKING);
+  const viewTarget = useMemo(() => {
+    return getChosenViewTarget(chosenViewTarget)
+  }, [Math.random()]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Grid columns={"1fr 3fr"} rows={"minmax(4em,auto) 1fr"} className="App-grid">
+        <Cell width={2}>
+          <Header/>
+        </Cell>
+        <Cell>
+          <Sidebar setChosenViewTarget={setChosenViewTarget}/>
+        </Cell>
+        <Cell>
+          <MainPage>
+            {viewTarget}
+          </MainPage>
+        </Cell>
+      </Grid>
     </div>
   );
 }
+
 
 export default App;

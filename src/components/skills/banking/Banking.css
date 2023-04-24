@@ -1,0 +1,33 @@
+.Bank-inventory-container {
+  background-color: #594979;
+  padding: 1em;
+  height: calc(100vh - 21%);
+}
+.Bank-inventory-header {
+  background-color: #244727;
+  padding: 1em;
+}
+.Bank-inventory-grid {
+  background-color: #444777;
+  padding: 1em;
+}
+.Bank-inventory-cell {
+  width: 10em;
+  height: 10em;
+  vertical-align: middle;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #444222;
+
+  border-radius: 0.5em;
+  margin: 0 auto;
+
+  text-align: center;
+  font-size: calc(0.3em + 0.5vmin);
+}
+.Bank-inventory-cell > img {
+  padding: 20px;
+  width: 40px;
+}
