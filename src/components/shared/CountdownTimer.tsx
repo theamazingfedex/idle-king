@@ -56,32 +56,32 @@ class CountdownTimer extends Component<CountdownTimerProps, any> {
 
     let x = setInterval(() => {
 
-        let now = Date.now();
-        let distance = self.state.endDate.getTime() - now;
+      let now = Date.now();
+      let distance = self.state.endDate.getTime() - now;
 
-        let days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        let millis = Math.floor((distance));
+      let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      let millis = Math.floor((distance));
 
+      self.setState({
+        days,
+        hours,
+        minutes,
+        seconds,
+        millis,
+        distance
+      });
+
+      if (distance <= 0) {
+        clearInterval(x);
+        console.log('FINISHED AN EVENT')
         self.setState({
-            days,
-            hours,
-            minutes,
-            seconds,
-            millis,
-            distance
+            expired: true,
+            intervals: this.state.intervals.filter(int => int != x)
         });
-
-        if (distance <= 0) {
-            clearInterval(x);
-            console.log('FINISHED AN EVENT')
-            self.setState({
-                expired: true,
-                intervals: this.state.intervals.filter(int => int != x)
-            });
-        }
+      }
     }, 100);
     // TODO: see about tracking all the intervals and removing them when we unmount to prevent hidden updates
     self.setState({ intervals: [...self.state.intervals, x] })
@@ -114,10 +114,12 @@ class CountdownTimer extends Component<CountdownTimerProps, any> {
         timeStr += progressPercentage;
         break;
       case 1:
-        timeStr += this.state.days ? (this.state.days > 9 ? this.state.days : "0" + this.state.days) + ":" : "";
-        timeStr += this.state.hours ? (this.state.hours > 9 ? this.state.hours : "0" + this.state.hours) + ":" : "";
-        timeStr += this.state.minutes ? (this.state.minutes > 9 ? this.state.minutes : "0" + this.state.minutes)  + ":" : "00:";
-        timeStr += this.state.seconds ? (this.state.seconds > 9 ? this.state.seconds : "0" + this.state.seconds) : "00";
+        timeStr += this.state.days ? (`${this.state.days}`.padStart(2, '0')) + ":" : "";
+        timeStr += this.state.hours ? (`${this.state.hours}`.padStart(2, '0')) + ":" : "";
+        timeStr += this.state.minutes ? (`${this.state.minutes}`.padStart(2, '0'))  + ":" : "";
+        timeStr += this.state.seconds ? (this.state.seconds) : "0";
+        timeStr += this.state.millis ? (`.${this.state.millis}`) : "";
+        timeStr += 's';
         break;
       case 2:
         timeStr += this.state.days ? (this.state.days > 9 ? this.state.days : "0" + this.state.days) + " days " : "";
@@ -147,11 +149,16 @@ class CountdownTimer extends Component<CountdownTimerProps, any> {
     }
 
     const percent = Math.min(100, Number(this.formatTime(0)));
+    const countdown = this.formatTime(1);
     console.log('percentage: ', percent);
     console.log('isRepeating: ', this.props.repeating);
+    const transitionDuration = Math.ceil((this.state.startDate.getTime() - this.state.endDate.getTime()) / 100) / 10;
+    const lineTransition = `stroke-dashoffset ${transitionDuration}s ease-in-out 0s`;
+
     return (
       <>
-        <Line percent={percent} strokeWidth={10} />
+        {countdown}
+        <Line percent={percent} steps={100} strokeWidth={10} transition={lineTransition} />
       </>
     );
   }
