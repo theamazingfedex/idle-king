@@ -71,7 +71,7 @@ function BankingHome() {
               <div className="Bank-inventory-cell">
                 <img alt={`${item.displayName} icon in bank inventory`} src={`./ItemDB/${item.img}`}/>
                 <p>{item.displayName} <NumberRenderer prefix={'x'}value={item.count}/></p>
-                <p>({item.gvalue * item.count}gp)</p>
+                <p><NumberRenderer postfix=' gp' value={item.gvalue * item.count}/></p>
               </div>
               <div className="Bank-inventory-modal-content">
                 delete all items? <span onClick={() => { updateInventory(item, -item.count); }}>click here</span>

@@ -25,7 +25,7 @@
   margin: 0 auto;
 
   text-align: center;
-  font-size: calc(0.3em + 0.5vmin);
+  font-size: calc(14px + 0.25vmin);
 }
 .Bank-inventory-cell > img {
   padding: 20px;
