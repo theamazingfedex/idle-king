@@ -27,6 +27,11 @@
   text-align: center;
   font-size: calc(14px + 0.25vmin);
 }
+.Bank-inventory-cell:hover {
+  filter: brightness(110%);
+  user-select: none;
+  cursor: pointer;
+}
 .Bank-inventory-cell > img {
   padding: 20px;
   width: 40px;

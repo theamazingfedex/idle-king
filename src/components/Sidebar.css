@@ -4,3 +4,8 @@
   height: 100%;
   overflow-y: auto;
 }
+.Sidebar > ul > li:hover {
+  filter: brightness(80%);
+  background-color: #444333;
+  cursor: pointer;
+}

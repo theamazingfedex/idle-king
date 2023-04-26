@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import './Mining.css';
 import { Grid, Cell } from 'styled-css-grid';
-import { AllTasks, getTimeToHarvest, useLocalStorage, useSetPlayerTask } from '../../../utils';
-import ItemDB, { getItemById, Item } from '../../../itemDb';
+import { getTimeToHarvestInSeconds, useBackgroundTask, useLocalStorage, useSetPlayerTask } from '../../../utils';
+import { AllSkills, AllTasks } from '../../../types';
+import { getItemById, Item } from '../../../itemDb';
 import ProgressBar from '../../shared/ProgressBar';
 import NumberRenderer from '../../shared/NumberRenderer';
 import DurationTimer from '../../shared/DurationTimer';
@@ -15,21 +16,15 @@ function MiningHome() {
   const [playerItems, updatePlayerItems, inventoryLastUpdatedAt] = useLocalStorage('idle-king-inventory', [] as Item[]);
   const [currentMiningTargetId, setCurrentMiningTargetId] = useState(0);
   const [currentPlayerTask, setPlayerTask, taskStartedAt] = useSetPlayerTask();
+  const [itemsToDisplay, updateItemsToDisplay] = useState(playerItems);
 
   // TODO: See about moving this logic out to a shared library, so we can continue updating even when not on the skill screen
+  useBackgroundTask((inventory) => updateItemsToDisplay(inventory));
   useEffect(() => {
     // did mount:
     const targetedItem = miningNodeItems.find(i => i.gatheringTask === currentPlayerTask)
     if (targetedItem && currentMiningTargetId !== targetedItem.id) {
       setCurrentMiningTargetId(targetedItem.id)
-      // calc the time since last updated then divide by tth
-      const timeDiff = Date.now() - inventoryLastUpdatedAt()
-      const currentTth = baseMiningTth + targetedItem.tthModifier;
-      if (timeDiff > currentTth) {
-        const offlineEarnings = Math.ceil(timeDiff / currentTth);
-        addOreToPlayerInventory({ ...targetedItem, count: offlineEarnings - 1 });
-      }
-
     }
     return () => {
       // will unmount:
@@ -41,16 +36,16 @@ function MiningHome() {
       setPlayerTask()
       setCurrentMiningTargetId(0);
     } else {
-      setPlayerTask(item.gatheringTask)
+      setPlayerTask(item.gatheringTask, AllSkills.MINING)
       setCurrentMiningTargetId(item.id);
     }
   }, [currentMiningTargetId, setPlayerTask]);
-  const getPlayerOreCount = useCallback((ore: Item) => playerItems.find(i => i.id === ore.id)?.count || 0, [playerItems]);
+  const getPlayerOreCount = useCallback((ore: Item) => itemsToDisplay.find(i => i.id === ore.id)?.count || 0, [itemsToDisplay]);
   const addOreToPlayerInventory = useCallback((item: Item) => {
-    if (playerItems.length > 0){
+    if (itemsToDisplay.length > 0){
       // add the item if the player doesn't have it
       let playerDoesntOwn = true;
-      const newItems = playerItems.map((pitem: Item) => {
+      const newItems = itemsToDisplay.map((pitem: Item) => {
         if (item.id === pitem.id) {
           playerDoesntOwn = false;
           return {...pitem, count: pitem.count + item.count};
@@ -60,10 +55,12 @@ function MiningHome() {
         newItems.push(item);
       }
       updatePlayerItems(newItems);
+      updateItemsToDisplay(newItems);
     } else {
       updatePlayerItems([item]);
+      updateItemsToDisplay([item]);
     }
-  }, [playerItems, updatePlayerItems]);
+  }, [itemsToDisplay, updatePlayerItems]);
 
 
   return (
@@ -87,7 +84,7 @@ function MiningHome() {
           <p>Owned: <NumberRenderer prefix={'x'} value={getPlayerOreCount(item)}/></p>
           {currentMiningTargetId === item.id
             ? <ProgressBar durationInMillis={item.tthModifier + baseMiningTth} callback={() => addOreToPlayerInventory(item)} repeating/>
-            : <p>{getTimeToHarvest(baseMiningTth, [item.tthModifier])}s</p> }
+            : <p>{getTimeToHarvestInSeconds(baseMiningTth, [item.tthModifier])}s</p> }
         </Cell>
       ))}
     </Grid>

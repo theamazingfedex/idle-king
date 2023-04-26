@@ -1,5 +1,5 @@
 import React from 'react';
-import { AllSkills } from '../utils';
+import { AllSkills } from '../types';
 import './Sidebar.css';
 
 type SidebarProps = {

@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Grid, Cell } from 'styled-css-grid';
-import { useLocalStorage } from '../../../utils';
+import { useBackgroundTask, useLocalStorage } from '../../../utils';
 import './Banking.css'
-import ItemDB, { Item } from '../../../itemDb';
-import NumberRenderer from '../../shared/NumberRenderer';
+import ItemDB, { Item, updateItemInItemsArray } from '../../../itemDb';
+import NumberRenderer, { NumberRendererTypes } from '../../shared/NumberRenderer';
 import CustomModal from '../../shared/CustomModal';
 
 const testItems: Item[] = [
@@ -13,34 +13,26 @@ const testItems: Item[] = [
 ];
 
 function BankingHome() {
-  const [items, setItems, itemsLastUpdatedAt, fetchLatestItems] = useLocalStorage('idle-king-inventory', testItems as Item[]);
+  const [playerItems, setItems, itemsLastUpdatedAt, fetchLatestItems] = useLocalStorage('idle-king-inventory', [] as Item[]);
   const [itemToDelete, setItemToDelete] = useState<number | undefined>();
   const [interval, updateInterval] = useState<NodeJS.Timer | undefined>();
+  const [itemsToDisplay, setItemsToDisplay] = useState<Item[]>(playerItems);
+  const [currentPlayerGP, setCurrentPlayerGP, gpLastUpdatedAt, fetchLatestGP] = useLocalStorage<number>('idle-king-player-gp', 0);
 
+  useBackgroundTask((updatedItems: Item[]) => setItemsToDisplay(updatedItems));
   const updateInventory = useCallback((item: Item, numToAdd: number) => {
-    let updatedItems: Item[] = items.map((pitem: Item) => {
-      if (pitem.id === item.id) {
-        const newCount = numToAdd +  pitem.count;
-        if (newCount <= 0) {
-          setItemToDelete(item.id);
-        }
-        return { ...pitem, count: pitem.count + numToAdd };
-      }
-      else return pitem;
-    });
-
-    if (itemToDelete) {
-      updatedItems = updatedItems.filter(i => i.id === itemToDelete)
-    }
-
+    const updatedItems = updateItemInItemsArray(item, itemsToDisplay, numToAdd);
     setItems(updatedItems);
-  }, [itemToDelete, items, setItems]);
+    setItemsToDisplay(updatedItems);
+  }, [itemsToDisplay, setItems]);
 
   useEffect(() => {
     // will mount:
     // add the timer
     updateInterval(setInterval(() => {
-      fetchLatestItems();
+      setItemsToDisplay(
+        fetchLatestItems()
+      );
     }, 2000));
     return () => {
       // will unmount:
@@ -48,11 +40,13 @@ function BankingHome() {
     }
   }, []);
 
-  console.log(items);
+  // console.log(itemsToDisplay); // this gets rendered a second time every other render
   return (
     <div className="Bank-inventory-container">
       <div className="Bank-inventory-header">
         Tabs go here?
+        <p>Current Gold Balance: <NumberRenderer postfix='gp' value={currentPlayerGP} type={NumberRendererTypes.GOLD} /></p>
+        <p>Total Bank Value: <NumberRenderer postfix={' gp'} value={itemsToDisplay.reduce((sum, item) => (sum + (item.gvalue * item.count)), 0)} type={NumberRendererTypes.GOLD} /></p>
       </div>
       <Grid
         columns={8}
@@ -61,7 +55,7 @@ function BankingHome() {
         alignContent="flex-start"
         className="Bank-inventory-grid"
         >
-        {items.length < 1 ? 'No Items Yet! Start your first task on the left!' : items.map((item: Item, idx: number) => (
+        {itemsToDisplay.length < 1 ? 'No Items Yet! Start your first task on the left!' : itemsToDisplay.map((item: Item, idx: number) => (
           <Cell className="Bank-inventory-cell" id={'bank-inventory-cell-' + item.id + '-' + idx} key={'bank-inventory-cell-' + item.id + '-' + idx}>
             <CustomModal
               parentElementId={'#bank-inventory-cell-' + item.id + '-' + idx}
@@ -74,7 +68,7 @@ function BankingHome() {
                 <p><NumberRenderer postfix=' gp' value={item.gvalue * item.count}/></p>
               </div>
               <div className="Bank-inventory-modal-content">
-                delete all items? <span onClick={() => { updateInventory(item, -item.count); }}>click here</span>
+                sell all items? <span onClick={() => { updateInventory(item, -item.count); setCurrentPlayerGP(currentPlayerGP + (item.count * item.gvalue)); }}>click here</span>
               </div>
             </CustomModal>
           </Cell>

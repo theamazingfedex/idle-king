@@ -1,24 +1,15 @@
-import { useCallback, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { addItemToPlayerInventory, getItemByTask, Item } from './itemDb';
+import { AllSkills, AllTasks } from './types';
 
-export enum AllTasks {
-  IDLE,
-  MINING_COAL,
-  MINING_COPPER,
-  MINING_IRON,
-  MINING_GOLD,
+export const BaseTimeToHarvest: { [k: number]: { [i: string]: number }} = {
+  [AllSkills.MINING]: {
+    [AllTasks.MINING_COAL]: 2500,
+    [AllTasks.MINING_COPPER]: 2500,
+    [AllTasks.MINING_IRON]: 3000,
+    [AllTasks.MINING_GOLD]: 3000,
+  }
 }
-
-export enum AllSkills {
-  BANKING,
-  MARKETING,
-  MINING,
-  SMITHING,
-  WOODCUTTING,
-  WOODWORKING,
-  RUNECRAFTING,
-  ENCHANTING,
-}
-
 export function useLocalStorage<T>(key: string, initialValue: T) {
   // State to store our value
   // Pass initial state function to useState so logic is only executed once
@@ -69,7 +60,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : storedValue;
     }
-    return Date.now();
+    return storedValue;
   }
 
   return [storedValue, setValue, getValueLastUpdatedAt, fetchLatestValue] as const;
@@ -89,22 +80,62 @@ export function convertMillisToCounter(timeInMillis: number) {
   return timeStr;
 }
 
-export function getTimeToHarvest (baseTth: number, tthModifiers: number[]) {
+export function getTimeToHarvestInSeconds (baseTth: number, tthModifiers: number[]) {
   const tth = tthModifiers.reduce((sum, modifier) => sum + modifier, baseTth)
   return Math.ceil(tth/10)/100;
 }
 
-export function useSetPlayerTask(): [AllTasks, Function, number] {
+export function useSetPlayerTask(): [AllTasks, Function, number, AllSkills] {
   // check current task, if same task, ignore but continue
   // if different task, change to this task and set the taskStartedTime from localStorage
   const [taskStartTime, updateTaskStartTime] = useLocalStorage<number>('idle-king-current-task-start', Date.now());
   const [currentTask, updateCurrentTask] = useLocalStorage<AllTasks>('idle-king-current-task', AllTasks.IDLE);
+  const [currentSkill, updateCurrentSkill] = useLocalStorage<AllSkills>('idle-king-current-skill', AllSkills.BANKING);
 
-  const updatePlayerTask = (task: AllTasks = AllTasks.IDLE) => {
+  const updatePlayerTask = (task: AllTasks = AllTasks.IDLE, skill: AllSkills = AllSkills.BANKING) => {
     if (currentTask !== task) {
       updateCurrentTask(task);
+      updateCurrentSkill(skill);
       updateTaskStartTime(Date.now());
     } 
   }
-  return [currentTask, updatePlayerTask, taskStartTime];
+  return [currentTask, updatePlayerTask, taskStartTime, currentSkill];
+}
+
+export function usePlayerCurrentTaskStartTime() {
+  return useLocalStorage<number>('idle-king-current-task-start', Date.now());
+}
+
+export function usePlayerCurrentTask() {
+  return useLocalStorage<AllTasks>('idle-king-current-task', AllTasks.IDLE);
+}
+
+export function usePlayerCurrentSkill() {
+  return useLocalStorage<AllSkills>('idle-king-current-skill', AllSkills.BANKING);
+}
+
+export function useBackgroundTask(updateComponentTrigger: (k: Item[]) => any = () => {}): [Item[], AllTasks, number] {
+    const [currentPlayerTask, updatePlayerTask, taskStartTime, currentPlayerSkill] = useSetPlayerTask()
+    const [playerItems, updatePlayerItems, inventoryLastUpdatedAt, getLatestPlayerItems] = useLocalStorage('idle-king-inventory', [] as Item[]);
+    useEffect(() => { // did mount:
+    // if (currentPlayerTask === AllTasks.IDLE) return;
+    const targetedItem: Item | undefined = getItemByTask(currentPlayerTask); //Object.values(ItemDB).find(i => i.gatheringTask === currentPlayerTask)
+
+    if (targetedItem && currentPlayerSkill && currentPlayerTask) {
+    //   setCurrentMiningTargetId(targetedItem.id)
+    //   // calc the time since last updated then divide by tth
+      const timeDiff = Date.now() - inventoryLastUpdatedAt()
+      const currentTth = BaseTimeToHarvest[currentPlayerSkill][currentPlayerTask] + (targetedItem?.tthModifier || 0);
+      if (timeDiff > currentTth) {
+        const offlineEarnings = Math.ceil(timeDiff / currentTth);
+        const updatedInventory = addItemToPlayerInventory({ ...targetedItem, count: Math.max(0, offlineEarnings - 1) } as Item, getLatestPlayerItems(), updatePlayerItems);
+        updateComponentTrigger(updatedInventory);
+        // updatePlayerItems(updatedInventory);
+      }
+    }
+    return () => {
+      // will unmount:
+    }
+  }, [currentPlayerSkill, currentPlayerTask, getLatestPlayerItems, inventoryLastUpdatedAt, playerItems, updateComponentTrigger, updatePlayerItems]);
+  return [playerItems, currentPlayerTask, taskStartTime]
 }

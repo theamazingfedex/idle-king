@@ -1,0 +1,18 @@
+export enum AllTasks {
+  IDLE,
+  MINING_COAL,
+  MINING_COPPER,
+  MINING_IRON,
+  MINING_GOLD,
+}
+
+export enum AllSkills {
+  BANKING,
+  MARKETING,
+  MINING,
+  SMITHING,
+  WOODCUTTING,
+  WOODWORKING,
+  RUNECRAFTING,
+  ENCHANTING,
+}

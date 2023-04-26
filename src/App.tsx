@@ -6,7 +6,7 @@ import Sidebar from './components/Sidebar';
 import MiningSkill from './components/skills/mining';
 import BankingSkill from './components/skills/banking';
 import { Grid, Cell } from 'styled-css-grid';
-import { AllSkills } from './utils';
+import { AllSkills } from './types';
 import MarketingHome from './components/skills/marketing';
 
 const getChosenViewTarget = (chosenTarget: AllSkills) => {
