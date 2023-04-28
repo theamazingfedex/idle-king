@@ -1,11 +1,11 @@
 .Sidebar {
   /* width: 30%; */
-  background-color: #777333;
+  background-color: #173e20;
   height: 100%;
   overflow-y: auto;
 }
 .Sidebar > ul > li:hover {
   filter: brightness(80%);
-  background-color: #444333;
+  background-color: #177333;
   cursor: pointer;
 }
