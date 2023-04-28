@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/idle-kingdom.com/static/css/main.ad87a4fd.css",
-    "main.js": "/idle-kingdom.com/static/js/main.2acf0387.js",
-    "static/js/787.e4e0471b.chunk.js": "/idle-kingdom.com/static/js/787.e4e0471b.chunk.js",
-    "index.html": "/idle-kingdom.com/index.html",
-    "main.ad87a4fd.css.map": "/idle-kingdom.com/static/css/main.ad87a4fd.css.map",
-    "main.2acf0387.js.map": "/idle-kingdom.com/static/js/main.2acf0387.js.map",
-    "787.e4e0471b.chunk.js.map": "/idle-kingdom.com/static/js/787.e4e0471b.chunk.js.map"
+    "main.css": "/theamazingfedex.github.io/idle-kingdom/static/css/main.ad87a4fd.css",
+    "main.js": "/theamazingfedex.github.io/idle-kingdom/static/js/main.5dd63bbd.js",
+    "static/js/787.e4e0471b.chunk.js": "/theamazingfedex.github.io/idle-kingdom/static/js/787.e4e0471b.chunk.js",
+    "index.html": "/theamazingfedex.github.io/idle-kingdom/index.html",
+    "main.ad87a4fd.css.map": "/theamazingfedex.github.io/idle-kingdom/static/css/main.ad87a4fd.css.map",
+    "main.5dd63bbd.js.map": "/theamazingfedex.github.io/idle-kingdom/static/js/main.5dd63bbd.js.map",
+    "787.e4e0471b.chunk.js.map": "/theamazingfedex.github.io/idle-kingdom/static/js/787.e4e0471b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.ad87a4fd.css",
-    "static/js/main.2acf0387.js"
+    "static/js/main.5dd63bbd.js"
   ]
 }
