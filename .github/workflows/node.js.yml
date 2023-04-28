@@ -25,5 +25,5 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm run build
-    - run: git add .
+    - run: git add . && git commit -m "added build folder"
     - run: git subtree push --prefix build origin gh-pages
