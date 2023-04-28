@@ -26,7 +26,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "npm run build && mv .gitignore dotgitignore && mv deployment.gitignore .gitignore && git add . && git commit -m \"add build folder\" && git push origin `git subtree split --prefix build dev`:gh-pages --force && mv .gitignore deployment.gitignore && mv dotgitignore .gitignore && git reset --hard head~1 && echo \"Complete!!\""
   },
   "eslintConfig": {
     "extends": [
