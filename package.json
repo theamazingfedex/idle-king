@@ -2,7 +2,7 @@
   "name": "idle-king",
   "version": "0.1.0",
   "private": true,
-  "homepage": "idle-kingdom.com",
+  "homepage": "theamazingfedex.github.io/idle-kingdom/",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -29,7 +29,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "publish": "git push origin `git subtree split --prefix build dev`:gh-pages --force",
-    "deploy": "gh-pages -d build"
+    "deploy": "echo idle-kingdom.com > ./build/CNAME && gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
