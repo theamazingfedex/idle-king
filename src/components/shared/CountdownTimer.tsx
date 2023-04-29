@@ -104,7 +104,6 @@ class CountdownTimer extends Component<CountdownTimerProps, any> {
 
   formatTime(type: number): string | number {
     let timeStr = "";
-    console.log(this.state.distance);
     const originalDistance = this.state.endDate.getTime() - this.state.startDate.getTime();
     const progressPercentage = this.state.distance === 0 ? 0 : Math.ceil(((originalDistance - this.state.distance) / originalDistance) * 100);
 
@@ -150,8 +149,6 @@ class CountdownTimer extends Component<CountdownTimerProps, any> {
 
     const percent = Math.min(100, Number(this.formatTime(0)));
     const countdown = this.formatTime(1);
-    console.log('percentage: ', percent);
-    console.log('isRepeating: ', this.props.repeating);
     const transitionDuration = Math.ceil((this.state.startDate.getTime() - this.state.endDate.getTime()) / 100) / 10;
     const lineTransition = `stroke-dashoffset ${transitionDuration}s ease-in-out 0s`;
 

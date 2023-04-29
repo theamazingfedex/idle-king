@@ -114,6 +114,10 @@ export function usePlayerCurrentSkill() {
   return useLocalStorage<AllSkills>('idle-king-current-skill', AllSkills.BANKING);
 }
 
+export function usePlayerInventory(player?: string) {
+      // const [playerItems, updatePlayerItems, inventoryLastUpdatedAt, getLatestPlayerItems] =
+      return useLocalStorage('idle-king-inventory', [] as Item[]);
+}
 export function useBackgroundTask(updateComponentTrigger: (k: Item[]) => any = () => {}): [Item[], AllTasks, number] {
     const [currentPlayerTask, updatePlayerTask, taskStartTime, currentPlayerSkill] = useSetPlayerTask()
     const [playerItems, updatePlayerItems, inventoryLastUpdatedAt, getLatestPlayerItems] = useLocalStorage('idle-king-inventory', [] as Item[]);

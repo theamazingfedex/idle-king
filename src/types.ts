@@ -4,6 +4,7 @@ export enum AllTasks {
   MINING_COPPER,
   MINING_IRON,
   MINING_GOLD,
+  SMITHING_STEEL_BAR,
 }
 
 export enum AllSkills {
@@ -16,3 +17,13 @@ export enum AllSkills {
   RUNECRAFTING,
   ENCHANTING,
 }
+
+export type LevelInfo = {
+  level: number
+  xp: number
+  difference: number
+}
+export type FixedSizeArray<N extends number, T> = N extends 0 ? never[] : {
+    0: T;
+    length: N;
+} & ReadonlyArray<T>;

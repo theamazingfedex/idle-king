@@ -8,6 +8,7 @@ import BankingSkill from './components/skills/banking';
 import { Grid, Cell } from 'styled-css-grid';
 import { AllSkills } from './types';
 import MarketingHome from './components/skills/marketing';
+import SmithingHome from './components/skills/smithing';
 
 const getChosenViewTarget = (chosenTarget: AllSkills) => {
   switch (chosenTarget) {
@@ -17,6 +18,8 @@ const getChosenViewTarget = (chosenTarget: AllSkills) => {
       return <MiningSkill/>;
     case AllSkills.MARKETING:
       return <MarketingHome/>;
+    case AllSkills.SMITHING:
+      return <SmithingHome/>;
     default:
       return <BankingSkill/>;
   }

@@ -1,4 +1,32 @@
-import { AllTasks } from "./types"
+import { AllTasks } from './types'
+
+
+export type Stat = {
+  name: string
+  value: number
+  level: number
+  xp: number
+}
+
+export type PlayerStats = {
+  health: Stat
+  pAccuracy: Stat
+  rAccuracy: Stat
+  mAccuracy: Stat
+  pDefense: Stat
+  rDefense: Stat
+  mDefense: Stat
+  pStrength: Stat
+  mStrength: Stat
+  rStrength: Stat
+}
+
+export type Player = {
+  name: string
+  uid: string
+  gold: number
+  stats: PlayerStats
+}
 
 export type Item = {
   img: string
@@ -21,15 +49,18 @@ const ItemDB: { [k: string]: Item } = {
   WOOD_PINE: { img: 'wood_pine.png', displayName: 'Pine Logs', id: 5, gvalue: 1, count: 1, xp: 5, tthModifier: 0, level: 1 },
   WOOD_OAK: { img: 'wood_oak.png', displayName: 'Oak Logs', id: 6, gvalue: 5, count: 1, xp: 10, tthModifier: 250, level: 5 },
   WOOD_MAPLE: { img: 'wood_maple.png', displayName: 'Maple Logs', id: 7, gvalue: 10, count: 1, xp: 15, tthModifier: 1000, level: 10 },
+  BAR_STEEL: { img: 'bar_steel.png', displayName: 'Steel Bar', id: 8, gvalue: 20, count: 1, xp: 12, tthModifier: 1000, level: 1, gatheringTask: AllTasks.SMITHING_STEEL_BAR },
 };
 
 export const getItemByTask = (task: AllTasks) => Object.values(ItemDB).find((v: any) => v.gatheringTask === task);
-export const getItemById = (itemId: number) => Object.values(ItemDB).find((v: any) => v.id === itemId);
+export const getItemById = (itemId: number, fromList?: Item[]) => Object.values(fromList || ItemDB).find((v: any) => v.id === itemId);
 export const updateItemInItemsArray = (item: Item, inventoryItems: Item[], numToAdd: number) => {
   let itemToDelete: number = -1;
+  let foundExisting = false;
 
   let updatedItems: Item[] = inventoryItems.map((pitem: Item) => {
     if (pitem.id === item.id) {
+      foundExisting = true;
       const newCount = numToAdd + pitem.count;
       if (newCount <= 0) {
         itemToDelete = item.id;
@@ -42,29 +73,34 @@ export const updateItemInItemsArray = (item: Item, inventoryItems: Item[], numTo
   if (itemToDelete >= 0) {
     updatedItems = updatedItems.filter(i => i.id !== itemToDelete)
   }
+  if (!foundExisting) {
+    updatedItems.push(item);
+  }
   return updatedItems;
 };
+
 export const addItemToPlayerInventory = (item: Item, playerItems: Item[], updatePlayerItems: (items: Item[]) => any): Item[] => {
-    if (playerItems.length > 0){
-      // add the item if the player doesn't have it
-      let playerDoesntOwn = true;
-      const newItems = playerItems.map((pitem: Item) => {
-        if (item.id === pitem.id) {
-          playerDoesntOwn = false;
-          return {...pitem, count: pitem.count + item.count};
-        } else return pitem;
-      });
-      if (playerDoesntOwn) {
-        newItems.push(item);
-      }
-      updatePlayerItems(newItems);
-      return newItems;
-    } else if (item.count > 0) {
-      updatePlayerItems([item]);
-      return [item];
-    } else {
-      return playerItems
-    }
+  if (playerItems.length > 0){
+    // add the item if the player doesn't have it
+    let playerDoesntOwn = true;
+    const newItems = updateItemInItemsArray(item, playerItems, item.count);
+    // const newItems = playerItems.map((pitem: Item) => {
+    //   if (item.id === pitem.id) {
+    //     playerDoesntOwn = false;
+    //     return {...pitem, count: pitem.count + item.count};
+    //   } else return pitem;
+    // });
+    // if (playerDoesntOwn) {
+    //   newItems.push(item);
+    // }
+    updatePlayerItems(newItems);
+    return newItems;
+  } else if (item.count > 0) {
+    updatePlayerItems([item]);
+    return [item];
+  } else {
+    return playerItems
   }
+}
 
 export default ItemDB;
